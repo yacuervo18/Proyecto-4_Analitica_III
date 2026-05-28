@@ -1,0 +1,100 @@
+﻿
+Trabajo final – XGBoost y SHAP 01-2026
+Objetivo del trabajo
+concesionario,liutilizandoeRegresióndLogísticaayi XGBoost, devaluandocsundesempeño omediante Estructura obligatoria del trabajo
+Desarrollar  y  comparar  modelos	e  clasific c ón  para  i entificar	lie  tes  riesgos s  en  un
+métricas y aná  sis interpr tables basados en SHAP.
+El documento debe estar organizado en las siguientes secciones: ·	Introducción
+·	Metodología ·	Resultados
+·	Conclusiones Toda figura y tabla debe:
+·	Tener título (numerado)
+·	Tener fuente (ej: elaboración propia)
+·	Ser referenciada en el texto antes de aparecer 1. Introducción
+La introducción debe presentar:
+·	Contexto del problema de clasificación de riesgo de clientes.
+·	Importancia de los modelos predictivos en decisiones financieras y comerciales. ·	Explicación breve de los modelos utilizados:
+o  Regresión Logística. o  XGBoost.
+
+·
+
+·
+·
+
+Importancia de la interpretabilidad en Machine Learning.
+
+Alcance y estructura del documento.
+Objetivo del trabajo.
+
+
+2. Metodología
+La metodología debe explicarse paso a paso de lo realizado.
+·	Tratamiento de los datos.
+·	Escalamiento.
+
+·	Conjunto de train y test.
+·	Modelo usado.
+·	Hiperpárametros a optimizar usadon Random Search de sklearn.
+·	SHAP.
+·	Validación com 10 muestras. 3. Resultados
+3.1 Resultados de la optimización Presentar:
+·	Mejores hiperparámetros encontrados. ·	Tabla comparativa.
+·	Discusión del comportamiento de los modelos.
+·	Explicar qué hiperparámetros favorecieron mayor ajuste o regularización. 3.2 Comparación de modelos
+Realizar una discusión profunda entre: ·	Regresión Logística.
+·	XGBoost. Analizar:
+·	Capacidad predictiva. ·	Sobreajuste.
+·	Capacidad de generalización.
+·	Diferencias entre modelos lineales y no lineales.
+La selección del mejor modelo debe estar completamente justificada. 3.3 Interpretabilidad con SHAP
+Una vez seleccionado el mejor modelo, se debe realizar un análisis profundo utilizando SHAP. Gráficos obligatorios de SHAP
+Importancia global de variables Incluir:
+·	SHAP Summary Plot. ·	SHAP Bar Plot.
+Analizar:
+·	variables más importantes,
+
+·	orden de impacto,
+·	magnitud de influencia. Dirección del efecto de las variables Incluir:
+·	SHAP Beeswarm Plot.
+·	SHAP Dependence Plot. Analizar:
+·	cómo afectan las variables el riesgo,
+·	si aumentan o disminuyen la probabilidad, ·	relaciones no lineales,
+·	patrones complejos. Explicaciones individuales Incluir:
+·	SHAP Force Plot. ·	Waterfall Plot.
+Explicar casos específicos de clientes. IMPORTANTE
+No se acepta únicamente mostrar gráficos. Cada gráfico debe incluir:
+·	interpretación técnica, ·	análisis crítico,
+·	discusión profunda,
+·	relación con el contexto financiero/comercial del concesionario. 3.4 Validación manual del modelo
+Con el mejor modelo seleccionado: Crear 10 clientes ficticios
+Deben inventar manualmente:
+·	valores de todas las variables, ·	perfiles distintos de clientes,
+·	clientes claramente riesgosos y no riesgosos,
+
+·	perfiles intermedios o ambiguos. Clasificación de los 10 clientes
+El modelo debe predecir:
+·	Probabilidad de riesgo. ·	Clasificación final.
+Análisis obligatorio Para cada cliente:
+·	Explicar por qué el modelo lo clasificó así. ·	Analizar si existe coherencia lógica.
+·	Relacionar el resultado con las variables.
+·	Explicar si el comportamiento del modelo tiene sentido financiero y comercial. Importante
+Las variables de entrada de estos 10 casos deben mostrarse en escala real. Por esta razón:
+·	XGBoost NO debe usar variables escaladas.
+·	La Regresión Logística sí debe usar escalamiento durante entrenamiento. 4. Conclusiones
+Las conclusiones deben responder: ·	¿Cuál fue el mejor modelo? ·	¿Por qué?
+·	¿Qué variables fueron más importantes? ·	¿Qué aprendieron del análisis SHAP?
+·	¿Qué limitaciones tuvo el trabajo?
+·	¿Qué mejoras futuras podrían realizarse? Las conclusiones deben ser técnicas y argumentadas. Requisitos técnicos
+El trabajo debe incluir:
+·	Código completamente funcional. ·	Notebook organizado.
+·	Comentarios explicativos.
+
+·	Resultados reproducibles. Calidad de gráficos
+Los gráficos deben:
+·	tener alta resolución, ·	ser elegantes,
+·	tener títulos,
+·	etiquetas claras,
+·	leyendas legibles,
+·	interpretación técnica.
+No se aceptan gráficos pixelados o sin explicación. Entregables
+1.   Documento tipo artículo en PDF.
+2.   Notebook en Google Colab o Jupyter Notebook.
