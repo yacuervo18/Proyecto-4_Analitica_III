@@ -1,0 +1,625 @@
+﻿Clasificación de clientes con riesgo de mora mediante Redes Neuronales Artificiales
+
+
+
+
+Clasificación de clientes con riesgofde mora mediante Redes Y.A. Cuervo Jaramillo
+Neuronales Arti iciales
+1. Introducción
+
+En  sectores  económicos  como  el  financiero  y  el  de  concesionarios  de  vehículos  automotores,  la evaluación del riesgo crediticio constituye uno de los pilares fundamentales para la toma de decisiones estratégicas, por consiguiente, La capacidad de identificar oportunamente a clientes con alta probabilidad de  incumplimiento  en  sus  obligaciones  financieras  permite  a  las  organizaciones  mitigar  pérdidas, optimizar  la  gestión  de  su  cartera  y  fortalecer  la  sostenibilidad  del  negocio.  Además,  la detección temprana de clientes con comportamiento moroso resulta crítica, dado que un crédito mal otorgado no solo representa una pérdida económica directa, sino que también afecta la liquidez de la entidad y su capacidad de operar eficientemente.
+
+Por tal motivo, el presente estudio aborda un problema de clasificación binaria, cuyo objetivo es predecir si un cliente presentará mora superior a 30 días en un período de 3 meses (M3_30AC), a partir de un conjunto de variables sociodemográficas y financieras. Este problema reviste especial importancia en la práctica, dado que los errores de clasificación tienen consecuencias asimétricas: no detectar a un cliente riesgoso  implica  asumir  una pérdida por incumplimiento, mientras que clasificar erróneamente a un cliente solvente como moroso puede derivar en la exclusión de un buen cliente y el deterioro de la relación comercial. Por tanto, se requiere un modelo que no solo tenga alta capacidad predictiva global, sino que maximice la detección de los casos de incumplimiento real, priorizando el recall de la clase positiva como métrica principal de evaluación.
+
+
+El conjunto de datos utilizado para construir este modelo está conformado por 21.091 registros de clientes de una entidad financiera, cada uno descrito por 12 variables que capturan diferentes dimensiones del perfil  del  solicitante.  Las variables sociodemográficas incluyen; Edad, Género y Perfil (asalariado o independiente),  mientras  que  las  variables  financieras  y  crediticias  comprenden  ScoreCrediticio, PorcentajeFinanciacion,  Plazo,  IngresoEstimado,  Gastos,  CapacidadDePago,  ValorCuotaMensual  y Estado del crédito (nuevo o usado). La variable objetivo M3_30AC indica si el cliente presentó mora mayor a 30 días en los últimos 3 meses, donde 1 corresponde a clientes con mora y 0 a clientes sin mora. La distribución de esta variable evidencia un desbalance severo: el 96,03% de los registros pertenece a la
+
+
+
+Página 1 de 16
+Clasificación de clientes con riesgo de mora mediante Redes Neuronales Artificiales
+
+
+clase negativa (sin mora) y solo el 3,97% a la clase positiva (con mora), lo que representa una proporción aproximada  de  24:1.  Este  desbalance  implica  que un modelo ingenuo que prediga siempre la clase mayoritaria alcanzaría una precisión global del 96% sin detectar ningún caso de incumplimiento, lo cual es inaceptable desde la perspectiva del negocio. Para mitigar este problema, se aplica una estrategia de undersampling aleatorio con una proporción 1:2, conservando todos los registros de la clase minoritaria y extrayendo una muestra representativa de la clase mayoritaria.
+
+
+El desarrollo del estudio sigue una estructura metodológica que inicia con un análisis exploratorio de datos, orientado a identificar patrones, distribuciones y variables con capacidad discriminante entre clases. Posteriormente, se realiza el ajuste de un modelo de red neuronal artificial, incluyendo la optimización de hiperparámetros y un proceso de selección de variables basado en los hallazgos del análisis exploratorio. Finalmente,  se  evalúa  el  desempeño  del  modelo  bajo  diferentes  configuraciones,  comparando  los resultados y justificando la selección del modelo final.
+
+
+El  objetivo  de  este  estudio  es  desarrollar  un  modelo  de  clasificación  basado  en  redes  neuronales artificiales que permita identificar clientes con riesgo de incumplimiento crediticio a partir de variables sociodemográficas y financieras, con el fin de apoyar la toma de decisiones en la gestión del riesgo de crédito y contribuir a la reducción de pérdidas por mora en concesionario de autos con programas de financiación propia o entidades financieras.
+
+
+
+2. Resultados
+En esta sección se presentan los resultados obtenidos a partir del análisis exploratorio de datos, el ajuste de los modelos, el proceso de selección de variables y el ajuste del umbral de clasificación. El propósito de  este  análisis es evaluar el desempeño de las diferentes configuraciones del modelo, comparar su capacidad predictiva bajo distintos enfoques y, finalmente, justificar de manera rigurosa la selección del modelo final en función del objetivo del estudio.
+
+
+2.1 Resultados del análisis exploratorio de datos
+El  análisis  exploratorio  de  datos  permite  identificar  patrones  relevantes  en  las  variables,  evaluar diferencias  entre  clases  y  detectar posibles relaciones que contribuyan a la capacidad predictiva del modelo. En esta subsección se presentan los principales hallazgos a partir de diferentes herramientas
+
+
+
+
+
+Página 2 de 16
+Clasificación de clientes con riesgo de mora mediante Redes Neuronales Artificiales
+
+
+gráficas, con el fin de identificar variables con potencial discriminante en el problema de clasificación de clientes con riesgo de mora.
+
+
+La Figura 1 presenta la distribución de la variable objetivo M3_30AC en la base de datos completa, evidenciando el desbalance existente entre clases.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Figura 1. Distribución de la variable objetivo — Riesgo de mora (M3_30AC). Fuente: Elaboración propia.
+
+A partir de la Figura 1 se confirma el desbalance severo de la variable objetivo: el 96,0% de los registros corresponde a clientes sin mora (clase 0) y únicamente el 4,0% a clientes con mora (clase 1), con una proporción  aproximada  de  24:1.  Este  desbalance  tiene  implicaciones  directas  en  el  proceso  de modelación, dado que un clasificador que prediga siempre la clase mayoritaria alcanzaría una exactitud del 96% sin detectar ningún caso de incumplimiento real. Por esta razón, se aplica una estrategia de undersampling en proporción 1:2 antes del ajuste del modelo, conservando todos los casos de mora y extrayendo una muestra representativa de la clase mayoritaria.
+
+
+La Figura 2 presenta la distribución de densidad de cada variable numérica diferenciada por clase. Este análisis permite evaluar la superposición entre clases y la capacidad de cada variable para discriminar entre ellas. Curvas con menor traslape indican mayor capacidad discriminativa de la variable.
+
+
+Página 3 de 16
+Clasificación de clientes con riesgo de mora mediante Redes Neuronales Artificiales
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Figura 2. Distribución de densidad por variable y clase. Fuente: Elaboración propia.
+
+A partir de la Figura 2 se observa que la variable Edad presenta una separación notable entre clases: los clientes con mora (clase 1) concentran su distribución en edades más jóvenes (entre 20 y 35 años), mientras que los clientes sin mora (clase 0) presentan una distribución más desplazada hacia edades intermedias y mayores. Este comportamiento sugiere que la edad es un factor relevante en la probabilidad de incumplimiento.
+
+
+El ScoreCrediticio exhibe una de las separaciones más claras entre clases: los clientes con mora presentan scores concentrados en valores más bajos, mientras que los clientes sin mora tienden a scores más altos. Esta diferencia es consistente con la función del score como indicador de riesgo crediticio y posiciona esta variable como una de las más relevantes para el modelo.
+
+
+La variable PorcentajeFinanciacion muestra que los clientes con mora tienden a financiar una proporción mayor del valor del bien, concentrándose cerca del 100%, mientras que los clientes sin mora presentan una distribución más amplia. Esto sugiere que niveles altos de financiación están asociados a mayor riesgo de incumplimiento.
+
+
+En contraste, variables como Plazo, Gastos, IngresoEstimado, CapacidadDePago y ValorCuotaMensual presentan un alto grado de solapamiento entre clases, lo que indica una menor capacidad discriminante
+
+
+
+
+
+Página 4 de 16
+Clasificación de clientes con riesgo de mora mediante Redes Neuronales Artificiales
+
+
+individual.  No  obstante,  estas  variables  podrían  aportar  información  complementaria  al  modelo  en combinación con las demás.
+
+
+La Figura 3 presenta diagramas de caja por variable y por clase, permitiendo analizar la dispersión, la ubicación de la mediana, la presencia de valores atípicos y las diferencias en la distribución de los datos entre clientes con y sin mora.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Figura 3. Boxplot por variable y clase. Fuente: Elaboración propia.
+
+A partir de la Figura 3 se confirman y refuerzan los patrones observados en la Figura 2. La variable ScoreCrediticio presenta la separación más clara entre clases: la caja correspondiente a clientes con mora (clase 1) se ubica completamente por debajo de la caja de clientes sin mora (clase 0), con medianas notoriamente  distintas.  Este  resultado  refuerza  su  posición  como  la  variable  con  mayor  capacidad discriminante en el conjunto de datos.
+
+
+La  variable Edad también muestra una separación relevante en sus medianas: los clientes con mora presentan una mediana de edad inferior, lo que es consistente con el patrón identificado en el gráfico de densidad. Por su parte, PorcentajeFinanciacion muestra que la clase 1 tiene su caja desplazada hacia valores más altos, confirmando que niveles elevados de financiación están asociados a mayor riesgo de incumplimiento.
+
+
+
+
+
+Página 5 de 16
+Clasificación de clientes con riesgo de mora mediante Redes Neuronales Artificiales
+
+
+En contraste, variables como Plazo, Gastos e IngresoEstimado presentan cajas con posiciones y tamaños muy similares entre clases, lo que indica baja capacidad discriminante. Sin embargo, se observa que la clase 0 tiende a presentar bigotes más largos y mayor cantidad de valores atípicos en variables como IngresoEstimado y Gastos, lo que refleja una mayor heterogeneidad financiera en los clientes sin mora. En conjunto, este análisis refuerza la relevancia de ScoreCrediticio, Edad y PorcentajeFinanciacion como variables con potencial discriminante.
+
+
+La Figura 4 presenta la matriz de correlaciones entre las variables numéricas del conjunto de datos. Este análisis  permite  identificar  relaciones  lineales  entre  predictoras  y  detectar  posibles  problemas  de multicolinealidad.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Figura 4. Matriz de correlaciones entre variables numéricas. Fuente: Elaboración propia.
+
+El  hallazgo  más  relevante  de  la Figura 4 es la correlación perfecta negativa (-1,00) entre Gastos y CapacidadDePago.   Esta   relación  indica  que  ambas  variables  capturan  esencialmente  la  misma información con signo contrario, lo que representa un caso claro de redundancia. Incluir ambas variables en el modelo no aporta información adicional y puede dificultar la interpretación de los pesos aprendidos por la red neuronal. Este hallazgo sugiere que una de las dos variables debería ser excluida en el proceso de selección de variables.
+
+
+
+
+
+Página 6 de 16
+Clasificación de clientes con riesgo de mora mediante Redes Neuronales Artificiales
+
+
+Se   identifican   correlaciones   moderadas   entre   PorcentajeFinanciacion   y   Plazo   (0,41),   y   entre PorcentajeFinanciacion y ValorCuotaMensual (0,42). Estas relaciones son conceptualmente coherentes: un mayor porcentaje de financiación tiende a estar asociado con plazos más largos y cuotas más elevadas. Sin embargo, al no superar el umbral de 0,7, no representan un problema crítico de multicolinealidad. El resto de las variables presentan correlaciones cercanas a cero, lo que indica que capturan dimensiones independientes del perfil del cliente.
+
+
+La Figura 5 presenta la tasa de mora por categoría de cada variable cualitativa del conjunto de datos: Género, Perfil y Estado del crédito. La línea roja punteada representa la tasa global de mora (4,0%), que sirve como referencia para evaluar si una categoría presenta mayor o menor riesgo de incumplimiento respecto al comportamiento promedio de la cartera.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Figura 5. Tasa de mora por variable categórica. Fuente: Elaboración propia.
+
+En  cuanto al Género, se observa que los clientes masculinos presentan una tasa de mora del 4,5%, mientras  que  las  clientes  femeninas  registran  un  3,3%.  Si bien existe una diferencia de 1,2 puntos porcentuales,  esta  no  es  suficientemente  amplia  como  para considerar el género como una variable altamente discriminante. Respecto al Perfil del cliente, la diferencia entre clientes asalariados (4,1%) e independientes (3,8%) es mínima — apenas 0,3 puntos porcentuales — lo que indica que el tipo de vinculación laboral no representa un factor diferenciador relevante en la probabilidad de mora.
+
+
+La variable Estado del crédito es la más discriminante entre las categóricas analizadas. Los créditos sobre bienes usados presentan una tasa de mora del 6,0%, superando en 2 puntos porcentuales la tasa global, mientras que los créditos sobre bienes nuevos registran apenas un 3,3%. Esta diferencia sugiere que el
+
+
+
+Página 7 de 16
+Clasificación de clientes con riesgo de mora mediante Redes Neuronales Artificiales
+
+
+tipo  de  bien  financiado está asociado al comportamiento de pago del cliente y podría aportar valor predictivo al modelo. En conjunto, Estado es la variable categórica con mayor capacidad discriminante, seguida  de  Género  con  una  contribución  moderada,  mientras  que  Perfil  muestra  una  capacidad  de separación prácticamente nula.
+
+
+La  Figura  6  presenta  las  funciones  de  distribución  acumulada  empírica (ECDF) para cada variable numérica, diferenciadas por clase. El estadístico D de la prueba de Kolmogorov-Smirnov se reporta como medida cuantitativa de separación entre distribuciones, donde valores más altos indican mayor capacidad discriminante. Todas las variables presentaron diferencias estadísticamente significativas (p < 0,001).
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Figura 6. Distribución acumulada empírica (ECDF) por variable y clase. Fuente: Elaboración propia.
+
+Los resultados de la Figura 6 evidencian que PorcentajeFinanciacion presenta la mayor separación entre clases (D = 0,341), confirmándola como la variable con mayor capacidad discriminante del conjunto. ScoreCrediticio y CapacidadDePago comparten el segundo lugar (D = 0,217 ambas): en el caso del ScoreCrediticio, la curva de clientes con mora asciende más rápidamente en valores bajos, confirmando que scores crediticios reducidos están asociados a mayor probabilidad de mora; para CapacidadDePago, los clientes con mora acumulan más en valores bajos, coherente con la lógica financiera de que menor capacidad de pago implica mayor riesgo.
+
+
+IngresoEstimado (D = 0,169) y ValorCuotaMensual (D = 0,161) presentan separaciones moderadas pero consistentes. La Edad muestra una separación leve (D = 0,120), confirmando el patrón de clientes jóvenes
+
+
+
+Página 8 de 16
+Clasificación de clientes con riesgo de mora mediante Redes Neuronales Artificiales
+
+
+con más mora. Finalmente, Gastos (D = 0,074) y Plazo (D = 0,069) presentan los valores más bajos del estadístico  D,  indicando  que  su  distribución  es  prácticamente  similar  entre  clases  y  su  aporte discriminante individual es limitado.
+
+
+La Figura 7 presenta la tasa de mora por decil de cada variable numérica. Este análisis permite identificar la dirección y consistencia de la relación entre cada variable y la probabilidad de incumplimiento. Una tendencia  monotónica  —  ya  sea  creciente  o  decreciente — indica una relación sistemática entre la variable y la variable objetivo. La línea roja punteada representa la tasa global de mora (4,0%).
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Figura 7. Tasa de mora por decil de cada variable. Fuente: Elaboración propia.
+
+ScoreCrediticio presenta la tendencia decreciente más clara y consistente: el primer decil registra una tasa de mora del 8,3%, mientras que el décimo decil apenas alcanza el 1,0%. PorcentajeFinanciacion exhibe una tendencia creciente igualmente pronunciada: los primeros deciles presentan tasas cercanas al 0%, mientras que los deciles superiores alcanzan valores entre el 8% y el 9%. CapacidadDePago muestra una tendencia decreciente marcada: los primeros deciles superan el 5% de mora mientras los últimos caen por debajo del 2%.
+
+
+Edad e IngresoEstimado presentan tendencias decrecientes consistentes, aunque menos pronunciadas: clientes más jóvenes y con menores ingresos tienen mayor probabilidad de mora. ValorCuotaMensual muestra una tendencia creciente — clientes en los deciles inferiores tienen tasas cercanas al 1%, mientras que los deciles superiores superan el 7%. Gastos presenta un comportamiento plano sin tendencia clara,
+
+
+
+Página 9 de 16
+Clasificación de clientes con riesgo de mora mediante Redes Neuronales Artificiales
+
+
+confirmando su bajo poder predictivo individual. Plazo, al ser una variable con pocos valores únicos, muestra solo cuatro deciles con una tendencia creciente leve.
+
+
+En síntesis, el análisis exploratorio permite concluir que las variables con mayor capacidad discriminante son  PorcentajeFinanciacion,  ScoreCrediticio  y  CapacidadDePago,  dado  que  presentan  las  mayores diferencias  entre  clases  tanto  en  su  distribución  como  en  su  comportamiento  estructural.  Edad, IngresoEstimado  y ValorCuotaMensual aportan relaciones moderadas pero consistentes, mientras que Gastos  y  Plazo  muestran  el  menor  aporte  discriminante  individual.  Adicionalmente,  la  correlación perfecta  entre  Gastos  y  CapacidadDePago  (-1,00)  sugiere que solo una de estas dos variables debe incluirse en el modelo final. En cuanto a las variables categóricas, Estado del crédito emerge como la más relevante, seguida de Género con un aporte moderado. Estos hallazgos orientarán el proceso de selección de variables para el ajuste del modelo de red neuronal artificial.
+
+
+
+2.2 Resultados del ajuste del modelo y selección de variables
+
+En el contexto de la evaluación del riesgo crediticio para vehiculos, el costo asociado a la clasificación errónea de un cliente como no moroso, cuando en realidad presenta dificultades de pago, puede generar pérdidas económicas directas para la entidad financiera y comprometer la calidad de su cartera. Por esta razón, el criterio de evaluación del modelo se orienta a maximizar el recall de la clase positiva, de manera que los clientes clasificados como morosos correspondan, con la mayor cobertura posible, a entidades efectivamente en riesgo. Este enfoque permite garantizar la confiabilidad del modelo como herramienta de apoyo en la toma de decisiones crediticias.
+
+
+Se construyó un modelo inicial utilizando la totalidad de las variables disponibles, al que se denominó modelo   base,   incluyendo   la   optimización   de   hiperparámetros   mediante   búsqueda   exhaustiva. Posteriormente,  se  realizó un proceso de selección de variables basado en los hallazgos del análisis exploratorio, con el objetivo de evaluar si una reducción en la dimensionalidad mejora el desempeño. Finalmente, se evalúa el desempeño de ambos modelos bajo el umbral estándar de 0,5 y se justifica la selección del modelo final.
+
+
+Se construyó un modelo inicial utilizando la totalidad de las variables financieras y sociodemográficas disponibles, con un umbral de clasificación de 0,5. Posteriormente, se realizó un proceso de optimización de hiperparámetros mediante búsqueda exhaustiva sobre 144 combinaciones, evaluando variaciones en el
+
+
+
+Página 10 de 16
+Clasificación de clientes con riesgo de mora mediante Redes Neuronales Artificiales
+
+
+número de neuronas (8, 16, 32), función de activación (ReLU, ELU), tasa de aprendizaje (0,001, 0,01, 0,1), optimizador (Adam, RMSprop), tamaño de lote (32, 64) y tasa de Dropout (0,2, 0,3). La métrica de selección fue el recall de la clase positiva en el conjunto de prueba.
+
+
+La mejor configuración encontrada para el modelo base fue: 16 neuronas en dos capas ocultas, función de activación ReLU, tasa de aprendizaje de 0,0009, optimizador Adam, tamaño de lote de 64, Dropout de 0,2 y 100 épocas de entrenamiento con EarlyStopping (patience=15). Adicionalmente, se incorporaron pesos de clase balanceados automáticamente (class_weight) para penalizar explícitamente los errores en la clase minoritaria.  Esta  configuración  permitió  alcanzar  un  desempeño  estable,  con  buen  equilibrio  entre capacidad de ajuste y generalización.
+
+
+A  partir  de  los  resultados  del  análisis  exploratorio, se identificaron como variables más relevantes: ScoreCrediticio,	PorcentajeFinanciacion,	CapacidadDePago,	Edad,   Estado,   IngresoEstimado   y ValorCuotaMensual. Estas variables fueron utilizadas para construir un segundo modelo, con el objetivo de evaluar si una reducción en la dimensionalidad mejora el desempeño.
+
+
+Tras  la  optimización  de  hiperparámetros,  la  mejor  configuración  para  el  modelo  con  variables seleccionadas  fue:  arquitectura  de  tres  capas  ocultas  en  pirámide  32→16→8  neuronas,  función  de activación ELU — evitando Sigmoid en capas intermedias —, tasa de aprendizaje de 0,001, optimizador RMSprop — descartando SGD por su convergencia lenta —, tamaño de lote de 64, Dropout de 0,3 en la primera capa y 0,2 en las siguientes, y pesos de clase balanceados automáticamente. Esta configuración logró un modelo más parsimonioso, con menor complejidad estructural.
+
+
+La Tabla 2 presenta las métricas de evaluación para ambos modelos. Dado que la métrica prioritaria es el recall de la clase positiva, se observa que el modelo con variables seleccionadas alcanza valores elevados de recall (0,79 en entrenamiento y 0,75 en prueba), superando al modelo base (0,80 en entrenamiento y 0,75   en   prueba)   con  una  diferencia  mínima.  Adicionalmente,  la  diferencia  entre  métricas  de entrenamiento y prueba es inferior a 0,07 en ambos modelos, lo cual indica una adecuada capacidad de generalización y ausencia de sobreajuste significativo.
+
+
+Tabla 2. Métricas de evaluación modelos ajustados.
+
+
+
+
+
+
+
+Página 11 de 16
+Clasificación de clientes con riesgo de mora mediante Redes Neuronales Artificiales
+Train
+Test
+Train
+Test
+Train
+Test
+
+
+
+
+
+
+Modelo base —
+Clase 0
+
+Modelo base —
+Clase 1
+
+
+variables — Clase
+Modelo sel.
+0
+
+
+variables — Clase
+Modelo sel.
+1
+
+Precision
+
+
+0,87
+
+0,55
+
+
+0,86
+
+
+0,55
+
+Precision
+
+
+0,83
+
+0,50
+
+
+0,84
+
+
+0,51
+
+Recall	Recall
+
+
+0,68	0,63
+
+0,80	0,75
+
+
+0,67	0,64
+
+
+0,79	0,75
+
+Accuracy
+
+
+0,72
+
+0,72
+
+
+0,71
+
+
+0,71
+
+Accuracy
+
+
+0,67
+
+0,67
+
+
+0,68
+
+
+0,68
+
+
+Fuente: Elaboración propia.
+
+
+La Figura 8 muestra la evolución del error (Loss vs Epoch) para el modelo base optimizado y el modelo 2 con  variables  seleccionadas.  En  el  modelo  base  optimizado  se  observa  que  ambas  curvas  — entrenamiento y validación — descienden de manera consistente desde las primeras épocas, con una separación moderada que se estabiliza a partir de la época 10, confirmando la estabilidad del proceso de aprendizaje y la ausencia de sobreajuste severo. Por su parte, el modelo con variables seleccionadas presenta un comportamiento particularmente estable: el error de validación no aumenta a medida que avanza el entrenamiento y se mantiene cercano al error de entrenamiento a lo largo de todas las épocas, con  ambas  curvas  descendiendo  de  forma  paralela  y  convergente.  En  ambos  casos, la ausencia de divergencia  sostenida  entre  las  curvas  de  entrenamiento  y  validación  confirma  la  capacidad  de generalización de los modelos.
+
+
+
+Figura 8. Loss vs Epoch — Modelo base optimizado y modelo 2 Variables seleccionadas
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Página 12 de 16
+Clasificación de clientes con riesgo de mora mediante Redes Neuronales Artificiales
+
+
+Fuente: Elaboración propia.
+
+La Figura 9 presenta la relación entre precisión y recall para distintos valores del umbral en el conjunto de prueba  para  ambos modelos. En el modelo base optimizado se observa que el punto donde las dos métricas  se  aproximan  ocurre  en  un  umbral  de  0,634,  mientras  que  en  el  modelo  con  variables seleccionadas este punto se ubica en 0,630. En ambos casos el punto de cruce se encuentra por encima del umbral estándar de 0,5, lo que indica que bajo dicho umbral los modelos favorecen el recall sobre la precisión, comportamiento consistente con el objetivo del estudio. Este trade-off refleja que incrementos en el umbral pueden mejorar la precisión de la clase positiva, sin embargo estos incrementos generan una reducción significativa en el recall, confirmando que el umbral estándar de 0,5 representa el punto de operación más adecuado para maximizar la detección de clientes morosos.
+
+
+Figura 9. Precisión y Recall en función del umbral — Modelo base optimizado y Modelo con variables
+seleccionadas.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Fuente: Elaboración propia.
+
+
+
+La Figura 10 presenta las curvas ROC para ambos modelos en el conjunto de prueba. Se observa que los dos modelos presentan desempeños similares en términos de capacidad discriminante global, con valores
+
+
+
+Página 13 de 16
+Clasificación de clientes con riesgo de mora mediante Redes Neuronales Artificiales
+
+
+de AUC de 0,757 para el modelo base optimizado y 0,748 para el modelo con variables seleccionadas. Aunque el modelo base presenta un AUC ligeramente superior, esta diferencia de 0,009 puntos no es significativa en términos prácticos. Adicionalmente, dado que el AUC evalúa la capacidad discriminante global  independientemente del umbral y no está directamente alineado con la métrica prioritaria del estudio (recall de la clase positiva), este resultado no invalida la superioridad del modelo con variables seleccionadas en términos de parsimonia, estabilidad en el entrenamiento y aplicabilidad práctica. En conjunto, ambas curvas se alejan considerablemente de la diagonal del azar, confirmando que los modelos aportan valor predictivo real en la identificación de clientes con riesgo de mora.
+
+
+
+
+Figura 10.. Curva ROC en test — Modelo base optimizado,(AUC = 0,757) y Modelo con variables
+seleccionadas (AUC = 0 748).
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Fuente: Elaboración propia.
+En conjunto, los resultados evidencian que ambos modelos presentan un desempeño equivalente en la métrica prioritaria, con un recall de la clase positiva de 0,75 en el conjunto de prueba. Sin embargo, el modelo con variables seleccionadas ofrece ventajas adicionales en términos de complejidad: utiliza 7 variables en lugar de 11, reduce la dimensionalidad del problema y logra curvas de pérdida más estables durante el entrenamiento. La diferencia train-test en recall es de 0,04 puntos para el modelo con variables seleccionadas, frente a 0,05 para el modelo base, indicando una capacidad de generalización levemente superior.
+
+
+En términos de precisión de la clase positiva, el modelo con variables seleccionadas alcanza 0,51 en test frente al 0,50 del modelo base — diferencia mínima. El trade-off entre recall y precisión es gestionable en
+
+
+
+Página 14 de 16
+Clasificación de clientes con riesgo de mora mediante Redes Neuronales Artificiales
+
+
+este contexto: el costo de no detectar un moroso real es significativamente mayor que el costo de marcar erróneamente a un cliente solvente como riesgoso. Por tanto, la priorización del recall es la decisión correcta desde la perspectiva del negocio.
+
+
+En consecuencia, el modelo con variables seleccionadas se establece como el modelo final del estudio, al lograr  el  mismo  nivel  de  recall  que  el  modelo  base  con  menor  complejidad  estructural,  mejor interpretabilidad  y  mayor  estabilidad  en  el  entrenamiento.  Este  resultado  evidencia  que un proceso adecuado de selección de variables, apoyado en análisis exploratorio, puede simplificar el modelo sin sacrificar su desempeño en la métrica prioritaria.
+
+
+
+3. Conclusiones
+
+
+
+El  análisis  realizado  permitió  identificar  que  las  variables  con  mayor  capacidad  discriminante  son PorcentajeFinanciacion,   ScoreCrediticio   y   CapacidadDePago,   dado   que   presentan   diferencias significativas entre clases tanto en su distribución como en su comportamiento estructural a lo largo de los deciles. PorcentajeFinanciacion presentó el estadístico D más alto (0,341), confirmando que porcentajes elevados  de  financiación  están  fuertemente  asociados  al  incumplimiento.  ScoreCrediticio  exhibió la tendencia decreciente más clara — del 8,3% de mora en el primer decil al 1,0% en el décimo —, mientras que CapacidadDePago mostró una relación coherente donde menor capacidad de pago implica mayor riesgo. En contraste, variables como Gastos — redundante con CapacidadDePago por su correlación perfecta de -1,00 — evidenciaron menor capacidad de separación, limitando su contribución al proceso de clasificación.
+
+En términos de desempeño, el modelo con selección de variables presentó los mejores resultados al priorizar  el  recall  de  la  clase  positiva,  logrando  detectar  correctamente  3  de  cada  4  clientes  que efectivamente incurrirán en mora (recall = 0,75 en prueba). La diferencia entre entrenamiento y prueba fue inferior a 0,07 en ambos modelos, confirmando ausencia de sobreajuste significativo. La reducción en el número de variables permitió además simplificar la estructura del modelo sin sacrificar su desempeño, contribuyendo a su interpretabilidad y eficiencia operativa.
+
+Desde una perspectiva aplicada, los resultados confirman que es posible construir herramientas analíticas confiables  para  la  identificación  temprana  de  clientes  morosos,  permitiendo  activar  mecanismos preventivos — seguimiento, reestructuración de obligaciones o garantías adicionales — sobre la mayor
+
+
+
+Página 15 de 16
+Clasificación de clientes con riesgo de mora mediante Redes Neuronales Artificiales
+
+
+proporción  posible  de  clientes en riesgo. El trade-off entre recall y precisión es gestionable en este contexto, dado que el costo de una falsa alarma es significativamente menor que el costo de dejar pasar un moroso real.
+
+En conclusión, el modelo 2 con variables seleccionadas se establece como el modelo final del estudio, al ofrecer el mejor balance entre recall, simplicidad y aplicabilidad práctica. Este resultado evidencia que un proceso  riguroso  de  selección  de  variables apoyado en análisis exploratorio, combinado con ajustes arquitectónicos orientados a la métrica prioritaria y el manejo explícito del desbalance de clases, puede mejorar  significativamente  el  desempeño  de  los  modelos  de  clasificación  en  contextos  de  riesgo crediticio.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Página 16 de 16
